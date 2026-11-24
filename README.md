@@ -4,7 +4,28 @@
 
 It works on Windows, macOS, Linux, Chromebook, iPad and Android tablets, in Chrome, Edge, Firefox and Safari. Once the file is on your computer it also works offline.
 
-Made by [Nat Schooler](https://natschooler.com) and given away free under the MIT Licence.
+Made by [Nat Schooler](https://natschooler.com) for the [Influential Visions](https://influentialvisions.com) podcast, and given away free under the MIT Licence.
+
+---
+
+## ⚠️ No support is provided
+
+This software is free and given as it is. I do not offer help installing it, fixing it or answering questions about it. If something breaks, it is yours to fix. Use it at your own risk, and always keep a copy of your scripts.
+
+---
+
+## Want to say thank you? Get my book.
+
+**CATAPULT PROTOCOL™ — The Career Playbook for the AI and Superintelligence Shift**
+$7.99 launch price for the first 1,000 copies only.
+👉 [GET THE BOOK](https://natschooler.com/cat/)
+
+Feeling rich and want to support another creator? [DONATE HERE](https://buy.stripe.com/fZudR896FfExeje8IWfAc0b)
+
+
+Subscribe to [Influential Visions on YouTube](https://www.youtube.com/@influentialvisions?sub_confirmation=1) and follow the podcast.
+
+---
 
 ## Features
 

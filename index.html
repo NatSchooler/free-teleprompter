@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browser Teleprompter – Free Teleprompter in One HTML File</title>
+<meta name="description" content="A free teleprompter that runs in your web browser from a single HTML file. Auto-scroll, speed and size controls, mirror mode, camera overlay, full screen and keyboard shortcuts. No install, no account, works offline.">
+<meta name="theme-color" content="#111111">
+<style>
+  :root {
+    --bg: #0d0d0d; --panel: #1a1a1a; --line: #2c2c2c; --text: #f2f2f2;
+    --muted: #9a9a9a; --accent: #3fa7ff; --go: #2fbf71; --stop: #e5484d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  .hide { display: none !important; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+
+  header { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--line); z-index: 5; }
+  .grp { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .title { font-weight: 700; letter-spacing: .02em; }
+  .sep { width: 1px; height: 24px; background: var(--line); }
+  .btn { background: #262626; color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+    padding: 7px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .btn:hover { border-color: #555; }
+  .btn.on { border-color: var(--accent); color: var(--accent); }
+  .btn-go { background: var(--go); border-color: var(--go); color: #fff; font-weight: 600; }
+  .btn-go.playing { background: var(--stop); border-color: var(--stop); }
+  .ctl { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .ctl input[type=range] { width: 100px; }
+  .val { min-width: 26px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+
+  main { flex: 1; position: relative; overflow: hidden; }
+
+  /* Editor */
+  #edit { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+  #script { flex: 1; width: 100%; resize: none; background: #141414; color: var(--text);
+    border: 1px solid var(--line); border-radius: 8px; padding: 16px; font-size: 18px; line-height: 1.6; font-family: inherit; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .small { font-size: 13px; color: var(--muted); }
+
+  /* Prompter */
+  #prompter { position: absolute; inset: 0; background: #000; }
+  #cam { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; transform: scaleX(-1); }
+  #scroller { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; }
+  #scroller::-webkit-scrollbar { display: none; }
+  #text { max-width: 1100px; margin: 0 auto; padding: 45vh 6vw 80vh; font-size: 64px; line-height: 1.35;
+    font-weight: 600; white-space: pre-wrap; word-wrap: break-word; text-shadow: 0 2px 6px rgba(0,0,0,.8); }
+  #text.mirror { transform: scaleX(-1); }
+  #text.flip { transform: scaleY(-1); }
+  #text.mirror.flip { transform: scale(-1, -1); }
+  #marker { position: absolute; left: 0; right: 0; top: 45vh; height: 0; border-top: 2px dashed rgba(63,167,255,.55);
+    pointer-events: none; }
+  #marker::before { content: "▶"; position: absolute; left: 8px; top: -14px; color: var(--accent); font-size: 18px; }
+  #progress { position: absolute; left: 0; bottom: 0; height: 4px; width: 0; background: var(--accent); }
+  #countdown { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 30vh; font-weight: 800; color: var(--accent); background: rgba(0,0,0,.5); pointer-events: none; }
+  #camerr { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--stop);
+    color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 14px; z-index: 3; }
+
+  body.clean header { opacity: 0; transition: opacity .3s; }
+  body.clean header:hover { opacity: 1; }
+  @media (max-width: 700px) { #text { font-size: 40px; } .ctl input[type=range] { width: 80px; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="grp">
+      <span class="title">Teleprompter</span>
+      <div class="sep"></div>
+      <button class="btn" id="toggle" title="Switch between the script editor and the prompter (E)">Edit Script</button>
+    </div>
+    <div class="grp" id="controls">
+      <div class="ctl"><label for="size">Size</label><input type="range" id="size" min="24" max="160" value="64"><span class="val" id="sizev">64</span></div>
+      <div class="ctl"><label for="speed">Speed</label><input type="range" id="speed" min="1" max="50" value="15"><span class="val" id="speedv">15</span></div>
+      <div class="sep"></div>
+      <button class="btn" id="mirror" title="Mirror text left to right for teleprompter glass (M)">Mirror</button>
+      <button class="btn" id="flip" title="Flip text upside down (V)">Flip</button>
+      <button class="btn" id="camb" title="Show your camera behind the text (C)">Camera</button>
+      <button class="btn" id="cd" title="Three-second countdown before scrolling starts">Countdown</button>
+      <button class="btn" id="full" title="Full screen (F)">Full</button>
+      <button class="btn btn-go" id="play" title="Start or pause (Space)">Start</button>
+      <button class="btn" id="reset" title="Back to the top (Home)">Top</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="edit" class="hide">
+      <textarea id="script" spellcheck="true" placeholder="Type or paste your script here..."></textarea>
+      <div class="row">
+        <div class="grp">
+          <label class="btn" for="file" title="Load a .txt or .md file">Open file</label>
+          <input type="file" id="file" accept=".txt,.md,text/plain" class="hide">
+          <button class="btn" id="download" title="Save the script as a .txt file">Save as file</button>
+          <span class="small" id="status"></span>
+        </div>
+        <button class="btn btn-go" id="save">Save &amp; Open Prompter</button>
+      </div>
+      <div class="small">Your script is kept in this browser automatically. Shortcuts: Space start/pause · ↑/↓ speed · ←/→ nudge · +/− size · Home top · M mirror · F full screen · E edit.</div>
+    </div>
+
+    <div id="prompter">
+      <video id="cam" class="hide" autoplay muted playsinline></video>
+      <div id="camerr" class="hide">Camera unavailable. Check browser permission.</div>
+      <div id="scroller"><div id="text"></div></div>
+      <div id="marker"></div>
+      <div id="countdown" class="hide"></div>
+      <div id="progress"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k) { try { return localStorage.getItem('tp_' + k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem('tp_' + k, v); } catch (e) {} }
+  };
+
+  const SAMPLE = "Welcome to your browser teleprompter.\n\nClick Edit Script to type or paste your own words.\n\nPress Space, or the Start button, to begin scrolling.\n\nUse the up and down arrow keys to change the speed while you read.\n\nTurn on Mirror if you are reading through teleprompter glass.\n\nKeep your eyes on the line marked by the arrow and speak naturally.\n\nGood luck with your recording.";
+
+  const text = $('text'), scroller = $('scroller'), area = $('script');
+  const size = $('size'), speed = $('speed'), playB = $('play');
+  let mode = 'prompter', playing = false, last = 0, carry = 0, stream = null, raf = 0, counting = false;
+
+  // ---- restore settings ----
+  area.value = store.get('script') ?? SAMPLE;
+  text.textContent = area.value;
+  if (store.get('size')) size.value = store.get('size');
+  if (store.get('speed')) speed.value = store.get('speed');
+  text.style.fontSize = size.value + 'px';
+  $('sizev').textContent = size.value; $('speedv').textContent = speed.value;
+  if (store.get('mirror') === '1') { text.classList.add('mirror'); $('mirror').classList.add('on'); }
+  if (store.get('flip') === '1') { text.classList.add('flip'); $('flip').classList.add('on'); }
+  if (store.get('cd') === '1') $('cd').classList.add('on');
+
+  // ---- modes ----
+  function setMode(m) {
+    mode = m;
+    $('edit').classList.toggle('hide', m !== 'edit');
+    $('prompter').classList.toggle('hide', m !== 'prompter');
+    $('controls').classList.toggle('hide', m !== 'prompter');
+    $('toggle').textContent = m === 'edit' ? 'Back to Prompter' : 'Edit Script';
+    if (m === 'edit') { pause(); area.focus(); }
+  }
+  function saveScript() {
+    store.set('script', area.value);
+    text.textContent = area.value;
+    $('status').textContent = 'Saved';
+    setTimeout(() => { $('status').textContent = ''; }, 1500);
+  }
+  let t;
+  area.addEventListener('input', () => { clearTimeout(t); t = setTimeout(saveScript, 600); });
+
+  // ---- scrolling ----
+  function step(ts) {
+    if (!playing) return;
+    const dt = last ? (ts - last) / 1000 : 0; last = ts;
+    carry += speed.value * 6 * dt;          // pixels per second = speed x 6
+    const px = Math.floor(carry);
+    if (px > 0) { scroller.scrollTop += px; carry -= px; }
+    if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1) { pause(); return; }
+    raf = requestAnimationFrame(step);
+  }
+  function play() {
+    if (playing || counting) return;
+    if ($('cd').classList.contains('on')) { countdown(3); return; }
+    go();
+  }
+  function go() {
+    playing = true; last = 0; carry = 0;
+    playB.textContent = 'Pause'; playB.classList.add('playing');
+    document.body.classList.add('clean');
+    raf = requestAnimationFrame(step);
+  }
+  function pause() {
+    playing = false; cancelAnimationFrame(raf);
+    playB.textContent = 'Start'; playB.classList.remove('playing');
+    document.body.classList.remove('clean');
+  }
+  function countdown(n) {
+    counting = true; const el = $('countdown'); el.classList.remove('hide'); el.textContent = n;
+    const iv = setInterval(() => {
+      n--; if (n > 0) { el.textContent = n; return; }
+      clearInterval(iv); el.classList.add('hide'); counting = false; go();
+    }, 1000);
+  }
+  function updateProgress() {
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    $('progress').style.width = (max > 0 ? (scroller.scrollTop / max) * 100 : 0) + '%';
+  }
+
+  // ---- camera ----
+  async function camOn() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      $('cam').srcObject = stream; $('cam').classList.remove('hide');
+      $('camb').classList.add('on'); $('camerr').classList.add('hide');
+    } catch (e) {
+      $('camerr').classList.remove('hide'); setTimeout(() => $('camerr').classList.add('hide'), 4000);
+    }
+  }
+  function camOff() {
+    if (stream) stream.getTracks().forEach(tr => tr.stop());
+    stream = null; $('cam').classList.add('hide'); $('camb').classList.remove('on');
+  }
+
+  // ---- controls ----
+  $('toggle').addEventListener('click', () => setMode(mode === 'edit' ? 'prompter' : 'edit'));
+  $('save').addEventListener('click', () => { saveScript(); setMode('prompter'); scroller.scrollTop = 0; updateProgress(); });
+  $('file').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { area.value = r.result; saveScript(); };
+    r.readAsText(f); e.target.value = '';
+  });
+  $('download').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([area.value], { type: 'text/plain' }));
+    a.download = 'teleprompter-script.txt'; a.click(); URL.revokeObjectURL(a.href);
+  });
+  function setSize(v) { v = Math.max(+size.min, Math.min(+size.max, v)); size.value = v;
+    text.style.fontSize = v + 'px'; $('sizev').textContent = v; store.set('size', v); }
+  function setSpeed(v) { v = Math.max(+speed.min, Math.min(+speed.max, v)); speed.value = v;
+    $('speedv').textContent = v; store.set('speed', v); }
+  size.addEventListener('input', () => setSize(+size.value));
+  speed.addEventListener('input', () => setSpeed(+speed.value));
+  function toggleClass(btn, cls, key) { const on = text.classList.toggle(cls); $(btn).classList.toggle('on', on); store.set(key, on ? '1' : '0'); }
+  $('mirror').addEventListener('click', () => toggleClass('mirror', 'mirror', 'mirror'));
+  $('flip').addEventListener('click', () => toggleClass('flip', 'flip', 'flip'));
+  $('cd').addEventListener('click', () => { const on = $('cd').classList.toggle('on'); store.set('cd', on ? '1' : '0'); });
+  $('camb').addEventListener('click', () => stream ? camOff() : camOn());
+  $('full').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); });
+  playB.addEventListener('click', () => playing ? pause() : play());
+  $('reset').addEventListener('click', () => { pause(); scroller.scrollTop = 0; updateProgress(); });
+  scroller.addEventListener('scroll', updateProgress);
+  scroller.addEventListener('click', () => playing ? pause() : play());
+
+  window.addEventListener('keydown', e => {
+    if (e.target === area) { if (e.key === 'Escape') setMode('prompter'); return; }
+    if (e.target.tagName === 'INPUT') return;
+    switch (e.key) {
+      case ' ': e.preventDefault(); if (mode === 'prompter') playing ? pause() : play(); break;
+      case 'ArrowUp': e.preventDefault(); setSpeed(+speed.value + 1); break;
+      case 'ArrowDown': e.preventDefault(); setSpeed(+speed.value - 1); break;
+      case 'ArrowRight': e.preventDefault(); scroller.scrollTop += 60; break;
+      case 'ArrowLeft': e.preventDefault(); scroller.scrollTop -= 60; break;
+      case '+': case '=': setSize(+size.value + 4); break;
+      case '-': case '_': setSize(+size.value - 4); break;
+      case 'Home': pause(); scroller.scrollTop = 0; break;
+      case 'm': case 'M': toggleClass('mirror', 'mirror', 'mirror'); break;
+      case 'v': case 'V': toggleClass('flip', 'flip', 'flip'); break;
+      case 'c': case 'C': stream ? camOff() : camOn(); break;
+      case 'f': case 'F': $('full').click(); break;
+      case 'e': case 'E': e.preventDefault(); setMode(mode === 'edit' ? 'prompter' : 'edit'); break;
+    }
+  });
+
+  setMode('prompter'); updateProgress();
+})();
+</script>
+</body>
+</html>

@@ -4,6 +4,8 @@
 
 It works on Windows, macOS, Linux, Chromebook, iPad and Android tablets, in Chrome, Edge, Firefox and Safari. Once the file is on your computer it also works offline.
 
+**Use it online now: [natschooler.com/teleprompter](https://natschooler.com/teleprompter/)**
+
 Made by [Nat Schooler](https://natschooler.com) for the [Influential Visions](https://influentialvisions.com) podcast, and given away free under the MIT Licence.
 
 ---

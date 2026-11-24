@@ -1,8 +1,10 @@
-# Browser Teleprompter
+# Free Teleprompter
 
 **A free teleprompter that runs in your web browser from one HTML file.** No install, no account, no sign-up and no tracking. Download it, open it, and start reading your script on camera.
 
 It works on Windows, macOS, Linux, Chromebook, iPad and Android tablets, in Chrome, Edge, Firefox and Safari. Once the file is on your computer it also works offline.
+
+Made by [Nat Schooler](https://natschooler.com) and given away free under the MIT Licence.
 
 ## Features
 
@@ -35,7 +37,7 @@ You can host your own copy for free so it opens from a web address on any device
 1. Click **Fork** at the top of this page to copy the repository to your own GitHub account.
 2. In your copy, go to **Settings**, then **Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**, select the **main** branch and the **/ (root)** folder, then click **Save**.
-4. After a minute or two your teleprompter is live at `https://YOUR-USERNAME.github.io/browser-teleprompter/`.
+4. After a minute or two your teleprompter is live at `https://YOUR-USERNAME.github.io/free-teleprompter/`.
 
 ### Option 3: put it on your own website
 
@@ -81,3 +83,4 @@ Everything lives in **index.html**: the styles at the top, the layout in the mid
 ## Licence
 
 Released under the MIT Licence. See [LICENSE](LICENSE). You are free to use, change and share it, including for commercial work.
+

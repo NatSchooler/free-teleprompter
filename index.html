@@ -3,19 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Browser Teleprompter – Free Teleprompter in One HTML File</title>
-<meta name="description" content="A free teleprompter that runs in your web browser from a single HTML file. Auto-scroll, speed and size controls, mirror mode, camera overlay, full screen and keyboard shortcuts. No install, no account, works offline.">
+<title>Free Online Teleprompter – No Download, No Sign-Up</title>
+<meta name="description" content="Free online teleprompter that runs in your browser. Paste your script, set the speed and read on camera. Mirror mode, webcam overlay, countdown and full screen. No download, no account, works offline.">
+<meta name="keywords" content="free teleprompter, online teleprompter, teleprompter app, browser teleprompter, autocue, teleprompter for webcam, mirror teleprompter, script scroller">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Nat Schooler">
+<link rel="canonical" href="https://natschooler.github.io/free-teleprompter/">
 <meta name="theme-color" content="#111111">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23111'/%3E%3Crect x='12' y='18' width='40' height='5' rx='2' fill='%233fa7ff'/%3E%3Crect x='12' y='29' width='32' height='5' rx='2' fill='%23fff'/%3E%3Crect x='12' y='40' width='36' height='5' rx='2' fill='%23fff'/%3E%3C/svg%3E">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Teleprompter – No Download, No Sign-Up">
+<meta property="og:description" content="Paste your script, set the speed and read on camera. Mirror mode, webcam overlay, countdown and full screen. Runs in your browser and works offline.">
+<meta property="og:url" content="https://natschooler.github.io/free-teleprompter/">
+<meta property="og:site_name" content="Free Teleprompter">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Free Online Teleprompter – No Download, No Sign-Up">
+<meta name="twitter:description" content="Paste your script, set the speed and read on camera. Runs in your browser, works offline, completely free.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Free Teleprompter",
+      "url": "https://natschooler.github.io/free-teleprompter/",
+      "description": "A free online teleprompter that runs in the browser from a single HTML file, with auto-scroll, mirror mode, webcam overlay, countdown and full screen.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any (web browser)",
+      "browserRequirements": "Requires a modern web browser with JavaScript",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": ["Adjustable auto-scroll speed", "Adjustable text size", "Mirror and flip modes for teleprompter glass", "Webcam overlay", "Countdown before scrolling", "Full screen", "Keyboard shortcuts", "Works offline"],
+      "author": { "@type": "Person", "name": "Nat Schooler", "url": "https://natschooler.com/" },
+      "license": "https://opensource.org/licenses/MIT"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is this teleprompter really free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It is free to use, with no account, no trial and no watermark. The code is open source under the MIT licence." } },
+        { "@type": "Question", "name": "Do I need to download or install anything?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. It runs in your web browser. You can also save the page as a single HTML file and use it offline." } },
+        { "@type": "Question", "name": "Can I use it with teleprompter glass?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Turn on Mirror to reverse the text for beam-splitter glass, and Flip if your rig needs the text upside down." } },
+        { "@type": "Question", "name": "Is my script uploaded anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Your script and settings stay in your own browser. Nothing is sent to a server and there is no tracking." } },
+        { "@type": "Question", "name": "Does it work on a phone or tablet?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It works in modern browsers on iPad, Android tablets, phones, Windows, macOS, Linux and Chromebook." } }
+      ]
+    }
+  ]
+}
+</script>
 <style>
   :root {
     --bg: #0d0d0d; --panel: #1a1a1a; --line: #2c2c2c; --text: #f2f2f2;
     --muted: #9a9a9a; --accent: #3fa7ff; --go: #2fbf71; --stop: #e5484d;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+  html, body { margin: 0; background: var(--bg); color: var(--text);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
   .hide { display: none !important; }
-  #app { display: flex; flex-direction: column; height: 100%; }
+  #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+  h1.title { margin: 0; font-size: 16px; }
 
   header { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
     padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--line); z-index: 5; }
@@ -44,7 +97,7 @@
   /* Prompter */
   #prompter { position: absolute; inset: 0; background: #000; }
   #cam { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; transform: scaleX(-1); }
-  #scroller { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; }
+  #scroller { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
   #scroller::-webkit-scrollbar { display: none; }
   #text { max-width: 1100px; margin: 0 auto; padding: 45vh 6vw 80vh; font-size: 64px; line-height: 1.35;
     font-weight: 600; white-space: pre-wrap; word-wrap: break-word; text-shadow: 0 2px 6px rgba(0,0,0,.8); }
@@ -60,6 +113,18 @@
   #camerr { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--stop);
     color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 14px; z-index: 3; }
 
+  /* Guide below the app */
+  #guide { max-width: 860px; margin: 0 auto; padding: 48px 20px 64px; line-height: 1.7; color: #d8d8d8; }
+  #guide h2 { color: var(--text); font-size: 26px; margin: 40px 0 10px; }
+  #guide h3 { color: var(--text); font-size: 18px; margin: 22px 0 4px; }
+  #guide a { color: var(--accent); }
+  #guide kbd { background: #262626; border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; font-size: 13px; }
+  #guide ul, #guide ol { padding-left: 22px; }
+  .scrollhint { position: absolute; right: 14px; bottom: 12px; font-size: 12px; color: var(--muted); z-index: 2; }
+  .scrollhint a { color: var(--muted); }
+  footer { text-align: center; padding: 24px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); }
+  footer a { color: var(--muted); }
+  :fullscreen body, body:fullscreen { overflow: hidden; }
   body.clean header { opacity: 0; transition: opacity .3s; }
   body.clean header:hover { opacity: 1; }
   @media (max-width: 700px) { #text { font-size: 40px; } .ctl input[type=range] { width: 80px; } }
@@ -69,7 +134,7 @@
 <div id="app">
   <header>
     <div class="grp">
-      <span class="title">Teleprompter</span>
+      <h1 class="title">Free Teleprompter</h1>
       <div class="sep"></div>
       <button class="btn" id="toggle" title="Switch between the script editor and the prompter (E)">Edit Script</button>
     </div>
@@ -109,9 +174,62 @@
       <div id="marker"></div>
       <div id="countdown" class="hide"></div>
       <div id="progress"></div>
+      <div class="scrollhint"><a href="#guide">How to use this teleprompter ↓</a></div>
     </div>
   </main>
 </div>
+
+<article id="guide">
+  <h2>A free online teleprompter for video, webinars and live talks</h2>
+  <p>This free teleprompter runs in your web browser. Paste your script, choose a comfortable speed and read straight to camera, with no download, no account and no watermark. It is built for YouTube videos, social clips, podcasts, online courses, webinars, Zoom and Teams calls, presentations and live streams.</p>
+  <p>The whole tool is a single HTML file. Your script never leaves your device, and once the page has loaded it keeps working offline.</p>
+
+  <h2>How to use the teleprompter</h2>
+  <ol>
+    <li>Click <strong>Edit Script</strong>, then type or paste your script. You can also open a .txt file.</li>
+    <li>Click <strong>Save &amp; Open Prompter</strong>.</li>
+    <li>Set the <strong>Size</strong> and <strong>Speed</strong> sliders, and turn on the <strong>Countdown</strong> if you want three seconds to get ready.</li>
+    <li>Press <kbd>Space</kbd> or click <strong>Start</strong>. Keep your eyes on the line beside the arrow marker.</li>
+    <li>Press <kbd>↑</kbd> or <kbd>↓</kbd> to speed up or slow down while you read, and <kbd>Space</kbd> to pause.</li>
+  </ol>
+
+  <h2>Features</h2>
+  <ul>
+    <li><strong>Smooth auto-scroll</strong> with speed you can change mid-read</li>
+    <li><strong>Mirror mode</strong> for teleprompter glass and beam-splitter rigs, plus an upside-down flip</li>
+    <li><strong>Webcam overlay</strong> so you can check your framing behind the text</li>
+    <li><strong>Countdown</strong>, <strong>full screen</strong> and a <strong>progress bar</strong></li>
+    <li><strong>Keyboard shortcuts</strong> for hands-free control</li>
+    <li><strong>Automatic saving</strong> of your script and settings in your browser</li>
+    <li><strong>Private and offline</strong>: no tracking, no cookies, no uploads</li>
+  </ul>
+
+  <h2>Keyboard shortcuts</h2>
+  <p><kbd>Space</kbd> start or pause · <kbd>↑</kbd> <kbd>↓</kbd> speed · <kbd>←</kbd> <kbd>→</kbd> nudge the text · <kbd>+</kbd> <kbd>−</kbd> text size · <kbd>Home</kbd> back to the top · <kbd>M</kbd> mirror · <kbd>V</kbd> flip · <kbd>C</kbd> camera · <kbd>F</kbd> full screen · <kbd>E</kbd> editor · <kbd>Esc</kbd> leave the editor</p>
+
+  <h2>Tips for reading a teleprompter naturally</h2>
+  <ul>
+    <li>Place the browser window as close to your camera lens as you can, so your eyes stay near the lens.</li>
+    <li>Start slower than you think you need, then raise the speed as you settle in.</li>
+    <li>Write short lines and leave a blank line between paragraphs, so you have natural places to breathe.</li>
+    <li>Read it through once out loud before you record, and mark any words that trip you up.</li>
+  </ul>
+
+  <h2>Frequently asked questions</h2>
+  <h3>Is this teleprompter really free?</h3>
+  <p>Yes. It is free to use, with no account, no trial and no watermark. The code is open source under the MIT licence.</p>
+  <h3>Do I need to download or install anything?</h3>
+  <p>No. It runs in your web browser. You can also save the page as a single HTML file and use it offline.</p>
+  <h3>Can I use it with teleprompter glass?</h3>
+  <p>Yes. Turn on Mirror to reverse the text for beam-splitter glass, and Flip if your rig needs the text upside down.</p>
+  <h3>Is my script uploaded anywhere?</h3>
+  <p>No. Your script and settings stay in your own browser. Nothing is sent to a server and there is no tracking.</p>
+  <h3>Does it work on a phone or tablet?</h3>
+  <p>Yes. It works in modern browsers on iPad, Android tablets, phones, Windows, macOS, Linux and Chromebook.</p>
+  <p><a href="#app">↑ Back to the teleprompter</a></p>
+</article>
+
+<footer>Made by <a href="https://natschooler.com/" rel="author">Nat Schooler</a> · Free Teleprompter is open source under the MIT licence · <a href="https://github.com/NatSchooler/free-teleprompter">View the code on GitHub</a></footer>
 
 <script>
 (() => {

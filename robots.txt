@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://natschooler.github.io/free-teleprompter/sitemap.xml
